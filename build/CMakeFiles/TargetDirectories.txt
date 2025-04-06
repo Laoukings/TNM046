@@ -1,0 +1,12 @@
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/CMakeFiles/tnm046-labs.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/CMakeFiles/INSTALL.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glfw-3.3.2/CMakeFiles/uninstall.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glfw-3.3.2/CMakeFiles/INSTALL.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glfw-3.3.2/CMakeFiles/ALL_BUILD.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glfw-3.3.2/src/CMakeFiles/glfw.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glfw-3.3.2/src/CMakeFiles/INSTALL.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glew/CMakeFiles/GLEW.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glew/CMakeFiles/INSTALL.dir
+C:/Users/laouk/Downloads/GLprimer/GLprimer/build/glew/CMakeFiles/ALL_BUILD.dir
