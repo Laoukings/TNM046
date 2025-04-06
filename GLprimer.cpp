@@ -149,7 +149,7 @@ int main(int, char*[]) {
         util::displayFPS(window);
 
         // Set the clear color to a dark gray (RGBA)
-        glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 0.0f);
 
         // Clear the color and depth buffers for drawing
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
