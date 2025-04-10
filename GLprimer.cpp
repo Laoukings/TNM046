@@ -44,14 +44,21 @@ Shader myShader;
  */
 int main(int, char*[]) {
 
-    // --- Put this code at the top of your main() function.
     // Vertex coordinates (x,y,z) for three vertices
     const std::vector<GLfloat>vertexArrayData = {
-        - 1.0f, -1.0f, 0.0f,  // First vertex, xyz
+          -1.0f, -1.0f, 0.0f,  // First vertex, xyz
           1.0f, -1.0f, 0.0f,  // Second vertex, xyz
           0.0f, 1.0f, 0.0f  // Third vertex, xyz
     };
     const std::vector<GLuint> indexArrayData = {0, 1, 2};
+
+     // --- Add this after the other vertex array declarations --------------
+    const std::vector<GLfloat> colorArrayData = {
+       1.0f, 0.0f, 0.0f,  // Red
+       0.0f, 1.0f, 0.0f,  // Green
+       0.0f, 0.0f, 1.0f,  // Blue
+    };
+
     
 
     // Initialise GLFW
@@ -91,8 +98,6 @@ int main(int, char*[]) {
 
     myShader.createShader("vertex.glsl", "fragment.glsl");
 
-    // ------------------------------------------------------------------------
-    // ---- Put this code after glewInit(), but before the rendering loop
     // Generate 1 Vertex array object, put the resulting identifier in vertexArrayID
     GLuint vertexArrayID = 0;
     glGenVertexArrays(1, &vertexArrayID);
@@ -126,6 +131,19 @@ int main(int, char*[]) {
     // Deactivate the vertex array object again to be nice
     glBindVertexArray(0);
 
+    // Generate a second vertex buffer, activate it and copy data to it
+    GLuint colorBufferID = 0;  // Vertex colors
+    glGenBuffers(1, &colorBufferID);
+    glBindBuffer(GL_ARRAY_BUFFER, colorBufferID);
+    glBufferData(GL_ARRAY_BUFFER, colorArrayData.size() * sizeof(GLfloat), colorArrayData.data(),GL_STATIC_DRAW);
+    // Tell OpenGL how the data is stored in our color buffer
+    // Attribute #1, 3 dimensions (R,G,B -> vec3 in the shader),
+    // type GL_FLOAT, not normalized, stride 0, start at element 0
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    // Enable a second attribute (in this case, to hold vertex colors)
+    glEnableVertexAttribArray(1);
+
+
     // Show some useful information on the GL context
     std::cout << "GL vendor:       " << glGetString(GL_VENDOR)
               << "\nGL renderer:     " << glGetString(GL_RENDERER)
@@ -145,7 +163,6 @@ int main(int, char*[]) {
         // Set viewport. This is the pixel rectangle we want to draw into
         glViewport(0, 0, width, height);  // The entire window
 
-        // --- Insert this line into your rendering loop.
         util::displayFPS(window);
 
         // Set the clear color to a dark gray (RGBA)
@@ -157,8 +174,6 @@ int main(int, char*[]) {
         /* ---- Rendering code should go here ---- */
         glUseProgram(myShader.id());
 
-        // ------------------------------------------------------------------------
-        // ---- Put the following code in the rendering loop
         // Activate the vertex array object we want to draw (we may have several)
         glBindVertexArray(vertexArrayID);
         // Draw our triangle with 3 vertices.
@@ -166,7 +181,6 @@ int main(int, char*[]) {
         // "use the previously bound index buffer". (This is not obvious.)
         // The index buffer is part of the VAO state and is bound with it.
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
-
 
         // Swap buffers, display the image and prepare for next frame
         glfwSwapBuffers(window);
@@ -180,14 +194,13 @@ int main(int, char*[]) {
         }
     }
 
-    // ------------------------------------------------------------------------
-    // ---- Put the following code directly after the rendering loop (before
-    // glfwDestroyWindow())
     // release the vertex and index buffers as well as the vertex array
     glDeleteVertexArrays(1, &vertexArrayID);
     glDeleteBuffers(1, &vertexBufferID);
     glDeleteBuffers(1, &indexBufferID);
 
+   // release the color buffers
+   glDeleteBuffers(1, &colorBufferID);
 
     // Close the OpenGL window and terminate GLFW
     glfwDestroyWindow(window);
