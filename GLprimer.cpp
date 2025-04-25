@@ -39,46 +39,7 @@
 #include "Shader.hpp"
 
 #include <array>
-/*
-std::vector<GLfloat> matrixMult(std::vector<GLfloat> mat1, std::vector<GLfloat> mat2) {
-    std::vector<GLfloat> resultArray;
 
-
-    int row = 0;
-    for (int i = 0; i < 16; i++) {
-
-        resultArray[i] = 0;
-
-        for (int j = 0; j < 4; j++) {
-
-            for (int k = 0; k < 4; k++) {
-                resultArray[i] += mat1[j + row * 4] * mat2[j * 4 + k];
-            }
-            row++;
-        }
-    }
-    return resultArray;
-}
-*/
-
-/*
-1, 0, 0, 0,
-0, cos(x), -sin(x), 0,
-0, sin(x), cos(x), 0
-0, 0, 0, 1
-
-cos(x), 0, -sin(x), 0,
-0, 1, 0, 0,
-sin(x), 0, cos(x), 0
-0, 0, 0, 1
-
-cos(x), -sin(x), 0, 0,
-sin(x), cos(x), 0, 0,
-0, 0, 1, 0
-0, 0, 0, 1
-
-
-*/
 
 // Multiply 4x4 matrices m1 and m2 and return the result
 std::array<float, 16> mat4mult(const std::array<float, 16>& m1, const std::array<float, 16>& m2) {
@@ -332,10 +293,9 @@ int main(int, char*[]) {
     if (locationTime == -1) {  // If the variable is not found, -1 is returned
         std::cout << "Unable to locate variable'time'in shader!\n";
     }
-
-    mat4print(mat4translate(6, 3, 5));
-    mat4print(mat4mult(mat4translate(6, 3, 5), mat4scale(2)));
-
+    /*
+    mat4print(mat4translate(2, 2, 5));
+    */
     glEnable(GL_CULL_FACE);
 
     // Main loop
