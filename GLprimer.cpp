@@ -49,23 +49,23 @@ std::array<float, 16> mat4mult(const std::array<float, 16>& m1, const std::array
     // elements.8return
 
     result[0] = m1[0] * m2[0] + m1[4] * m2[1] + m1[8] * m2[2] + m1[12] * m2[3];
-    result[4] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
-    result[8] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
-    result[12] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
+    result[1] = m1[1] * m2[0] + m1[5] * m2[1] + m1[9] * m2[2] + m1[13] * m2[3];
+    result[2] = m1[2] * m2[0] + m1[6] * m2[1] + m1[10] * m2[2] + m1[14] * m2[3];
+    result[3] = m1[3] * m2[0] + m1[7] * m2[1] + m1[11] * m2[2] + m1[15] * m2[3];
 
-    result[1] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
+    result[4] = m1[0] * m2[4] + m1[4] * m2[5] + m1[8] * m2[6] + m1[12] * m2[7];
     result[5] = m1[1] * m2[4] + m1[5] * m2[5] + m1[9] * m2[6] + m1[13] * m2[7];
-    result[9] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
-    result[13] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
+    result[6] = m1[2] * m2[4] + m1[6] * m2[5] + m1[10] * m2[6] + m1[14] * m2[7];
+    result[7] = m1[3] * m2[4] + m1[7] * m2[5] + m1[11] * m2[6] + m1[15] * m2[7];
 
-    result[2] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
-    result[6] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
+    result[8] = m1[0] * m2[8] + m1[4] * m2[9] + m1[8] * m2[10] + m1[12] * m2[11];
+    result[9] = m1[1] * m2[8] + m1[5] * m2[9] + m1[9] * m2[10] + m1[13] * m2[11];
     result[10] = m1[2] * m2[8] + m1[6] * m2[9] + m1[10] * m2[10] + m1[14] * m2[11];
-    result[14] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
+    result[11] = m1[3] * m2[8] + m1[7] * m2[9] + m1[11] * m2[10] + m1[15] * m2[11];
 
-    result[3] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
-    result[7] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
-    result[11] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
+    result[12] = m1[0] * m2[12] + m1[4] * m2[13] + m1[8] * m2[14] + m1[12] * m2[15];
+    result[13] = m1[1] * m2[12] + m1[5] * m2[13] + m1[9] * m2[14] + m1[13] * m2[15];
+    result[14] = m1[2] * m2[12] + m1[6] * m2[13] + m1[10] * m2[14] + m1[14] * m2[15];
     result[15] = m1[3] * m2[12] + m1[7] * m2[13] + m1[11] * m2[14] + m1[15] * m2[15];
 
     return result;
@@ -93,8 +93,8 @@ std::array<float, 16> mat4identity() {
 std::array<float, 16> mat4rotx(float angle) {
     std::array<float, 16> temp = {
         1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, cos(angle), -sin(angle), 0.0f, 
-        0.0f, sin(angle), cos(angle), 0.0f,
+        0.0f, cos(angle), sin(angle), 0.0f, 
+        0.0f, -sin(angle), cos(angle), 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f};
     return temp;
 }
@@ -132,7 +132,7 @@ std::array<float, 16> mat4translate(float x, float y, float z) {
         1.0f, 0.0f, 0.0f, 0.0f, 
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f, 
-        x, y, z, 1.0f};
+        x   ,    y,    z, 1.0f};
 
     return temp;
 }
@@ -207,9 +207,12 @@ int main(int, char*[]) {
     };
     // --- Add this after the other vertex array declarations --------------
     const std::vector<GLfloat> colorArrayData = {
-        -1.0f, -1.0f, 0.8f,  // First vertex, xyz
-        1.0f,  -1.0f, 0.0f,  // Second vertex, xyz
-        0.0f,  1.0f,  0.0f   // Third vertex, xyz
+       1.0f, 0.0f, 0.0f,  // First vertex, xyz
+       0.0f, 1.0f, 0.0f,  // Second vertex, xyz
+       0.0f, 0.0f, 1.0f,   // Third vertex, xyz
+       1.0f, 1.0f, 0.0f,  // First vertex, xyz
+       0.0f, 1.0f, 1.0f,  // Second vertex, xyz
+       1.0f, 0.0f, 1.0f  // Third vertex, xyz
     };
 
     // --- Add this to the variable declarations --------------------------------------
@@ -335,13 +338,13 @@ int main(int, char*[]) {
         glUseProgram(myShader.id());            // Activate the shader to set its variables
         glUniform1f(locationTime, time);        // Copy the value to the shader program
         //View angle
-        std::array<GLfloat, 16> matViewAngle = mat4rotx((M_PI / 180) * 10);
+        std::array<GLfloat, 16> matViewAngle = mat4rotx(-(M_PI / 180) * 10);
         //Y-Axis rotation
-        std::array<GLfloat, 16> matOrbit_R = mat4roty((time / (M_PI)));
+        std::array<GLfloat, 16> matOrbit_R = mat4roty(2*(time / (M_PI)));
         //Translate in Z
         std::array<GLfloat, 16> mattranslate_T = mat4translate(0, 0, 0.7);
         //Y-axis rotation
-        std::array<GLfloat, 16> matspin_R = mat4roty(time / M_PI);
+        std::array<GLfloat, 16> matspin_R = mat4roty(10*time / M_PI);
         //Matrix mult ((rotateX*rotateY)*translateZ) * rotateY
 
         //Spin the cube own axis y
