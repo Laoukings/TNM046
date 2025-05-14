@@ -127,22 +127,66 @@ void TriangleSoup::createTriangle() {
 /* TODO: Split to 24 vertices to get the normals and texcoords right. */
 void TriangleSoup::createBox(float xsize, float ysize, float zsize) {
 
-    // The data array contains 8 floats per vertex:
-    // coordinate xyz, normal xyz, texcoords st
     const GLfloat vertex_array_data[] = {
-        -xsize, -ysize, -zsize, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 0
-        xsize,  -ysize, -zsize, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 1
-        -xsize, ysize,  -zsize, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 2
-        xsize,  ysize,  -zsize, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 3
-        -xsize, -ysize, zsize,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 0
-        xsize,  -ysize, zsize,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 1
-        -xsize, ysize,  zsize,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Vertex 2
-        xsize,  ysize,  zsize,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f   // Vertex 3
-    };
-    const GLuint index_array_data[] = {0, 3, 1, 0, 2, 3, 1, 4, 0, 1, 5, 4, 4, 2, 0, 4, 6, 2,
-                                       1, 3, 7, 1, 7, 5, 7, 2, 6, 7, 3, 2, 4, 5, 7, 4, 7, 6};
+    // +X face
+     xsize, -ysize, -zsize,  1, 0, 0,  0.0f, 0.0f,  // 0
+     xsize,  ysize, -zsize,  1, 0, 0,  0.0f, 1.0f,  // 1
+     xsize,  ysize,  zsize,  1, 0, 0,  1.0f, 1.0f,  // 2
+     xsize, -ysize,  zsize,  1, 0, 0,  1.0f, 0.0f,  // 3
 
-    nverts_ = 8;
+    // -X face
+    -xsize, -ysize, -zsize, -1, 0, 0,  0.0f, 0.0f,  // 4
+    -xsize, -ysize,  zsize, -1, 0, 0,  0.0f, 1.0f,  // 5
+    -xsize,  ysize,  zsize, -1, 0, 0,  1.0f, 1.0f,  // 6
+    -xsize,  ysize, -zsize, -1, 0, 0,  1.0f, 0.0f,  // 7
+
+    // +Y face
+    -xsize,  ysize, -zsize,  0, 1, 0,  0.0f, 0.0f,  // 8
+    -xsize,  ysize,  zsize,  0, 1, 0,  0.0f, 1.0f,  // 9
+     xsize,  ysize,  zsize,  0, 1, 0,  1.0f, 1.0f,  //10
+     xsize,  ysize, -zsize,  0, 1, 0,  1.0f, 0.0f,  //11
+
+    // -Y face
+    -xsize, -ysize, -zsize,  0, -1, 0,  0.0f, 0.0f, //12
+     xsize, -ysize, -zsize,  0, -1, 0,  0.0f, 1.0f, //13
+     xsize, -ysize,  zsize,  0, -1, 0,  1.0f, 1.0f, //14
+    -xsize, -ysize,  zsize,  0, -1, 0,  1.0f, 0.0f, //15
+
+    // +Z face
+    -xsize, -ysize,  zsize,  0, 0, 1,  0.0f, 0.0f,  //16
+     xsize, -ysize,  zsize,  0, 0, 1,  0.0f, 1.0f,  //17
+     xsize,  ysize,  zsize,  0, 0, 1,  1.0f, 1.0f,  //18
+    -xsize,  ysize,  zsize,  0, 0, 1,  1.0f, 0.0f,  //19
+
+    // -Z face
+    -xsize, -ysize, -zsize,  0, 0, -1,  0.0f, 0.0f, //20
+    -xsize,  ysize, -zsize,  0, 0, -1,  0.0f, 1.0f, //21
+     xsize,  ysize, -zsize,  0, 0, -1,  1.0f, 1.0f, //22
+     xsize, -ysize, -zsize,  0, 0, -1,  1.0f, 0.0f  //23
+};
+
+const GLuint index_array_data[] = {
+    // +X face
+     0,  1,  2,   0,  2,  3,
+
+    // -X face
+     4,  5,  6,   4,  6,  7,
+
+    // +Y face
+     8,  9, 10,   8, 10, 11,
+
+    // -Y face
+    12, 13, 14,  12, 14, 15,
+
+    // +Z face
+    16, 17, 18,  16, 18, 19,
+
+    // -Z face
+    20, 21, 22,  20, 22, 23
+};
+
+
+    nverts_ = 24;
     ntris_ = 12;
 
     vertexarray_.resize(8 * nverts_);

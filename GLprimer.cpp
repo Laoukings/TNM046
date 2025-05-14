@@ -139,6 +139,22 @@ std::array<float, 16> mat4translate(float x, float y, float z) {
     return temp;
 }
 
+std::array<float, 16> mat4perspective(float vfov, float aspect, float znear, float zfar) {
+    //float f = cos(vfov / 2) / sin(vfov / 2);
+
+    float f = 1 / tan(vfov / 2);
+
+    std::array<float, 16> temp = {
+        f/aspect, 0.0f, 0.0f, 0.0f, 
+        0.0f, f, 0.0f, 0.0f,
+        0.0f, 0.0f, -(zfar + znear)/(zfar - znear), -1.0f, 
+        0.0f, 0.0f, -(2 * zfar * znear)/(zfar - znear), 0.0f
+    };
+
+    return temp;
+
+}
+
 GLuint createVertexBuffer(int location, int dimensions, const std::vector<float>& vertices) {
     GLuint bufferID;
     // Generate buffer, activate it and copy the data
@@ -169,85 +185,6 @@ GLuint createIndexBuffer(const std::vector<unsigned int>& indices) {
 
 int main(int, char*[]) {
     
-    /*
-    std::vector<GLfloat> vertexArrayData = {
-    // +X face
-     1, -1, -1,
-     1,  1, -1,
-     1,  1,  1,
-     1, -1,  1,
-
-    // -X face
-    -1, -1, -1,
-    -1, -1,  1,
-    -1,  1,  1,
-    -1,  1, -1,
-
-    // +Y face
-    -1,  1, -1,
-    -1,  1,  1,
-     1,  1,  1,
-     1,  1, -1,
-
-    // -Y face
-    -1, -1, -1,
-     1, -1, -1,
-     1, -1,  1,
-    -1, -1,  1,
-
-    // +Z face
-    -1, -1,  1,
-     1, -1,  1,
-     1,  1,  1,
-    -1,  1,  1,
-
-    // -Z face
-    -1, -1, -1,
-    -1,  1, -1,
-     1,  1, -1,
-     1, -1, -1,
-};
-
-    std::vector<GLfloat> colorArrayData = {
-    // +X face (red)
-    1, 0, 0,  1, 0, 0,  1, 0, 0,  1, 0, 0,
-
-    // -X face (green)
-    0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0,
-
-    // +Y face (blue)
-    0, 0, 1,  0, 0, 1,  0, 0, 1,  0, 0, 1,
-
-    // -Y face (yellow)
-    1, 1, 0,  1, 1, 0,  1, 1, 0,  1, 1, 0,
-
-    // +Z face (cyan)
-    0, 1, 1,  0, 1, 1,  0, 1, 1,  0, 1, 1,
-
-    // -Z face (magenta)
-    1, 0, 1,  1, 0, 1,  1, 0, 1,  1, 0, 1,
-};
-
-    std::vector<GLuint> indexArrayData = {
-    // +X face
-     0,  1,  2,   0,  2,  3,
-
-    // -X face
-     4,  5,  6,   4,  6,  7,
-
-    // +Y face
-     8,  9, 10,   8, 10, 11,
-
-    // -Y face
-    12, 13, 14,  12, 14, 15,
-
-    // +Z face
-    16, 17, 18,  16, 18, 19,
-
-    // -Z face
-    20, 21, 22,  20, 22, 23,
-};*/
-
     // --- Add this to the variable declarations --------------------------------------
     Shader myShader;
 
@@ -255,7 +192,9 @@ int main(int, char*[]) {
 
     const GLFWvidmode* vidmode;  // GLFW struct to hold information about the display
     GLFWwindow* window;          // GLFW struct to hold information about the window
-
+    
+    std::array<GLfloat, 16> matT = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+                                    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     // Initialise GLFW
     glfwInit();
 
@@ -311,16 +250,6 @@ int main(int, char*[]) {
     // Activate the vertex array object
     glBindVertexArray(vertexArrayID);
 
-    /*
-    //CUBE RENDER
-    // Create the vertex buffer objects for attribute locations 0 and 1
-    // (the list of vertex coordinates and the list of vertex colors).
-    GLuint vertexBufferID = createVertexBuffer(0, 3, vertexArrayData);
-    GLuint colorBufferID = createVertexBuffer(1, 3, colorArrayData);
-    // Create the index buffer object (the list of triangles).
-    GLuint indexBufferID = createIndexBuffer(indexArrayData);
-    // Deactivate the vertex array object again to be nice
-    */
 
 
     glBindVertexArray(0);
@@ -333,17 +262,15 @@ int main(int, char*[]) {
 
     GLint locationTime = glGetUniformLocation(myShader.id(), "time");
     if (locationTime == -1) {  // If the variable is not found, -1 is returned
-        std::cout << "Unable to locate variable'time'in shader!\n";
+        //std::cout << "Unable to locate variable'time'in shader!\n";
     }
     
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
     // --- Put this before your rendering loop
-    // Generate a triangle
     TriangleSoup myShape;
-    //myShape.createTriangle();
-    myShape.createSphere(1.0f, 15);
-
+ 
+    myShape.createBox(0.2, 0.2, 1);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -356,8 +283,6 @@ int main(int, char*[]) {
         // Clear the color and depth buffers for drawing
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /* ---- Rendering code should go here ---- */
-
         // --- Add this to the rendering loop, right before the call to glBindVertexArray()
         glUseProgram(myShader.id());
 
@@ -369,50 +294,36 @@ int main(int, char*[]) {
         // The index buffer is part of the VAO state and is bound with it.
 
         // --- Put this in the rendering loop
-        // Draw the triangle
-        //myShape.render();
         myShape.render();
 
-        /*
-        //CUBE RENDER
-        glDrawElements(GL_TRIANGLES, indexArrayData.size() * sizeof(GLuint), GL_UNSIGNED_INT, nullptr);
-        
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // GL_FILL
-        glCullFace(GL_BACK);
-        
-        glDrawElements(GL_TRIANGLES, indexArrayData.size() * sizeof(GLuint), GL_UNSIGNED_INT,nullptr);
-        */
+    
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // GL_LINE
         //glCullFace(GL_FRONT);
     
-
 
         // Do this in the rendering loop to update the uniform variable "time"
         float time = static_cast<float>(glfwGetTime());  // Number of seconds since the program was started
         glUseProgram(myShader.id());            // Activate the shader to set its variables
         glUniform1f(locationTime, time);        // Copy the value to the shader program
         
-        
-        //View angle
-        std::array<GLfloat, 16> matViewAngle = mat4rotx((M_PI / 180) * 10);
-        //Y-Axis rotation
-        std::array<GLfloat, 16> matOrbit_R = mat4roty(2*(time / (M_PI)));
-        //Translate in Z
-        std::array<GLfloat, 16> mattranslate_T = mat4translate(0, 0, 0.7);
-        //Y-axis rotation
-        std::array<GLfloat, 16> matspin_R = mat4roty(10*time / M_PI);
-        //Matrix mult ((rotateX*rotateY)*translateZ) * rotateY
-
-        //Spin the cube own axis y
-        //Translate from origo
-        //Orbit around origo
-        //Tilt (rotate x)
-        std::array<GLfloat, 16> matTransformation = mat4mult(mat4mult(mat4mult(matViewAngle, matOrbit_R), mattranslate_T), matspin_R);
-       
-        std::array<GLfloat, 16> matT = matTransformation;
-        GLint locationV = glGetUniformLocation(myShader.id(), "T");
+        std::array<GLfloat, 16> matT = mat4identity();
+        GLint locationT = glGetUniformLocation(myShader.id(), "T");
         glUseProgram(myShader.id());  // Activate the shader to set its variables
-        glUniformMatrix4fv(locationV, 1, GL_FALSE, matT.data());  // Copy the value
+        glUniformMatrix4fv(locationT, 1, GL_FALSE, matT.data());  // Copy the value
+
+    
+        std::array<GLfloat, 16> matP = mat4perspective((M_PI/5), 16.0/9.0f, 0.1f, 100.0f);
+        GLint locationP = glGetUniformLocation(myShader.id(), "P");
+        glUniformMatrix4fv(locationP, 1, GL_FALSE, matP.data());  // Copy the value
+
+        std::array<GLfloat, 16> matRotation = mat4mult(mat4rotx(time), mat4roty(time));
+        //View translation of -3 in z
+        std::array<GLfloat, 16> matTranslate = mat4translate(0.0f, 0.0f, -3.0f);
+        std::array<GLfloat, 16> matMV = mat4mult(matTranslate, matRotation);
+
+        GLint locationMV = glGetUniformLocation(myShader.id(), "MV");
+        // glUseProgram(myShader.id());  // Activate the shader to set its variables
+        glUniformMatrix4fv(locationMV, 1, GL_FALSE, matMV.data());  // Copy the value
 
         // --- Insert this line into your rendering loop.
         util::displayFPS(window);
@@ -428,18 +339,6 @@ int main(int, char*[]) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
     }
-
-
-    /*
-    //CUBE RENDER
-    // release the color buffers
-    glDeleteBuffers(1, &colorBufferID);
-
-    // release the vertex and index buffers as well as the vertex array
-    glDeleteVertexArrays(1, &vertexArrayID);
-    glDeleteBuffers(1, &vertexBufferID);
-    glDeleteBuffers(1, &indexBufferID);
-    */
 
 
     // Close the OpenGL window and terminate GLFW

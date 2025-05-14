@@ -7,10 +7,9 @@ out vec4 finalcolor;
 
 in vec3 interpolatedNormal;
 in vec2 st;
-in vec3 lightDirection ;
 
 void main() {
-
+	/*
 	// vec3 L is the light direction
 	// vec3 V is the view direction - (0,0,1) in view space
 	// vec3 N is the normal
@@ -46,5 +45,7 @@ void main() {
 		dotRV = 0.0;  // Do not show highlight on the dark side
 	}
 	vec3 shadedcolor = Ia * ka + Id * kd * dotNL + Is * ks * pow(dotRV, n);
-	finalcolor = vec4(shadedcolor, 1.0);
+	*/
+
+	finalcolor = vec4(abs(interpolatedNormal), 1.0);
 }
