@@ -140,8 +140,7 @@ std::array<float, 16> mat4translate(float x, float y, float z) {
 }
 
 std::array<float, 16> mat4perspective(float vfov, float aspect, float znear, float zfar) {
-    //float f = cos(vfov / 2) / sin(vfov / 2);
-
+    
     float f = 1 / tan(vfov / 2);
 
     std::array<float, 16> temp = {
