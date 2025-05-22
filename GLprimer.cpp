@@ -34,8 +34,8 @@
 // --- Add this line to your includes
 #include "Utilities.hpp"
 #include "TriangleSoup.hpp"
-
-
+#include "Texture.hpp"
+#include "Rotator.hpp"
 #include <vector>
 // --- Add this to the includes ---------------------------------------------------
 #include "Shader.hpp"
@@ -264,12 +264,24 @@ int main(int, char*[]) {
         //std::cout << "Unable to locate variable'time'in shader!\n";
     }
     
-    glEnable(GL_CULL_FACE);
-
-    // --- Put this before your rendering loop
     TriangleSoup myShape;
- 
-    myShape.createBox(0.2, 0.2, 1);
+    TriangleSoup myDino;
+    TriangleSoup myCube;
+    myDino.readOBJ("meshes/trex.obj");
+    myShape.createSphere(0.5f, 50);
+    myCube.createBox(1,1,1);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
+    GLint locationTex = glGetUniformLocation(myShader.id(), "tex");
+    // Generate one texture object with data from a TGA file
+    Texture myTexture;
+    myTexture.createTexture("textures/earth.tga");
+    Texture myDinoTex;
+    myDinoTex.createTexture("textures/trex.tga");
+
+    KeyRotator myKeyRotator(window);
+    MouseRotator myMouseRotator(window);
 
     // Main loop
     while (!glfwWindowShouldClose(window)) {
@@ -286,43 +298,75 @@ int main(int, char*[]) {
         glUseProgram(myShader.id());
 
         // Activate the vertex array object we want to draw (we may have several)
-        glBindVertexArray(vertexArrayID);
         // Draw our triangle with 3 vertices.
         // When the last argument of glDrawElements is nullptr, it means
         // "use the previously bound index buffer". (This is not obvious.)
         // The index buffer is part of the VAO state and is bound with it.
-
-        // --- Put this in the rendering loop
-        myShape.render();
-
-    
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);  // was 3
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);  // GL_LINE
         //glCullFace(GL_FRONT);
     
-
+      
         // Do this in the rendering loop to update the uniform variable "time"
         float time = static_cast<float>(glfwGetTime());  // Number of seconds since the program was started
         glUseProgram(myShader.id());            // Activate the shader to set its variables
         glUniform1f(locationTime, time);        // Copy the value to the shader program
+
+        myKeyRotator.poll();
+        // Create a rotation matrix that depends on myKeyRotator.phi and myKeyRotator.theta
+        std::array<GLfloat, 16> matKeyRotator = mat4mult(mat4rotx(-myKeyRotator.theta()), mat4roty(-myKeyRotator.phi()));
+        myMouseRotator.poll();
+        // Create rotation matrix that depends on myMouseRotator.phi and myMouseRotator.theta
+        std::array<GLfloat, 16> matMouseRotator = mat4mult(mat4rotx(myMouseRotator.theta()), mat4roty(-myMouseRotator.phi()));
         
-        std::array<GLfloat, 16> matT = mat4identity();
+        //Variable T from mouse input sent to vertex shader
+        std::array<GLfloat, 16> matT = matMouseRotator;
         GLint locationT = glGetUniformLocation(myShader.id(), "T");
         glUseProgram(myShader.id());  // Activate the shader to set its variables
         glUniformMatrix4fv(locationT, 1, GL_FALSE, matT.data());  // Copy the value
 
-    
-        std::array<GLfloat, 16> matP = mat4perspective((M_PI/5), 16.0/9.0f, 0.1f, 100.0f);
+        //Perspective
+        std::array<GLfloat, 16> matP = mat4perspective((M_PI/5), 16.0 / 9.0f, 0.1f, 100.0f);
         GLint locationP = glGetUniformLocation(myShader.id(), "P");
         glUniformMatrix4fv(locationP, 1, GL_FALSE, matP.data());  // Copy the value
 
-        std::array<GLfloat, 16> matRotation = mat4mult(mat4rotx(time), mat4roty(time));
-        //View translation of -3 in z
-        std::array<GLfloat, 16> matTranslate = mat4translate(0.0f, 0.0f, -3.0f);
-        std::array<GLfloat, 16> matMV = mat4mult(matTranslate, matRotation);
+        //X and y rotation
+        std::array<GLfloat, 16> matRotationX = mat4rotx(-M_PI / 2);
+        std::array<GLfloat, 16> matRotationY = mat4roty(5*time);
+        
+        //No orbit translation or rotation
+        std::array<GLfloat, 16> matOrbit = mat4roty(0);
+        std::array<GLfloat, 16> matTranslate = mat4translate(0.0f, 0.0f, 0.0f);
+
+        //Scale, perpective and a temp Totalmult
+        std::array<GLfloat, 16> matScale = mat4scale(0.15f);
+        std::array<GLfloat, 16> matPerspective = mat4rotx(M_PI); 
+        std::array<GLfloat, 16> matTotalmult = mat4mult(matPerspective, mat4mult(matOrbit, mat4mult(matTranslate, mat4mult(matRotationY, mat4mult(matScale, matRotationX)))));
+       
+        glUniform1i(locationTex, 0);
+
+        //Modelview for sphere(earth)
+        std::array<GLfloat, 16> matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -2), matTotalmult), mat4scale(2.5f));
 
         GLint locationMV = glGetUniformLocation(myShader.id(), "MV");
         // glUseProgram(myShader.id());  // Activate the shader to set its variables
         glUniformMatrix4fv(locationMV, 1, GL_FALSE, matMV.data());  // Copy the value
+
+        glBindTexture(GL_TEXTURE_2D, myTexture.id());
+        myShape.render();
+
+        //Modelview for dino change by key input
+        matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -2), matKeyRotator), mat4scale(0.5f));
+
+        glUniformMatrix4fv(locationMV, 1, GL_FALSE, matMV.data());  // Copy the value
+
+        glBindTexture(GL_TEXTURE_2D, myDinoTex.id());
+        myDino.render();
+
+        // restore previous state (no texture, no shader)
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glUseProgram(0);
+
 
         // --- Insert this line into your rendering loop.
         util::displayFPS(window);
