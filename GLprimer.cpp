@@ -335,8 +335,8 @@ int main(int, char*[]) {
         std::array<GLfloat, 16> matRotationY = mat4roty(5*time);
         
         //No orbit translation or rotation
-        std::array<GLfloat, 16> matOrbit = mat4roty(0);
-        std::array<GLfloat, 16> matTranslate = mat4translate(0.0f, 0.0f, 0.0f);
+        std::array<GLfloat, 16> matOrbit = mat4roty(0);//2*time
+        std::array<GLfloat, 16> matTranslate = mat4translate(0.0f, 0.0f, 0.5f);
 
         //Scale, perpective and a temp Totalmult
         std::array<GLfloat, 16> matScale = mat4scale(0.15f);
@@ -346,7 +346,7 @@ int main(int, char*[]) {
         glUniform1i(locationTex, 0);
 
         //Modelview for sphere(earth)
-        std::array<GLfloat, 16> matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -2), matTotalmult), mat4scale(2.5f));
+        std::array<GLfloat, 16> matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -2.5), matTotalmult), mat4scale(2.5f));
 
         GLint locationMV = glGetUniformLocation(myShader.id(), "MV");
         // glUseProgram(myShader.id());  // Activate the shader to set its variables
@@ -356,7 +356,7 @@ int main(int, char*[]) {
         myShape.render();
 
         //Modelview for dino change by key input
-        matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -2), matKeyRotator), mat4scale(0.5f));
+        matMV = mat4mult(mat4mult(mat4translate(0.0f, 0.0f, -3.0), matKeyRotator), mat4scale(0.5f));
 
         glUniformMatrix4fv(locationMV, 1, GL_FALSE, matMV.data());  // Copy the value
 
